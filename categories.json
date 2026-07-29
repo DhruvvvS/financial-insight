@@ -1,0 +1,15 @@
+{
+  "income": ["salary", "credit", "freelance", "upwork", "interest credit"],
+  "rent": ["rent payment", "landlord"],
+  "utilities": ["electricity", "bses", "broadband", "fibernet", "mobile recharge", "jio"],
+  "food_delivery": ["swiggy", "zomato"],
+  "groceries": ["bigbasket", "dmart", "grocery"],
+  "shopping": ["amazon", "flipkart"],
+  "transport": ["uber", "ola", "petrol", "fuel"],
+  "entertainment": ["netflix", "movie", "pvr", "spotify"],
+  "health": ["pharmacy", "apollo", "hospital", "medical"],
+  "personal_care": ["salon", "grooming", "spa"],
+  "subscriptions": ["gym", "fitclub", "membership"],
+  "big_purchases": ["laptop", "croma", "appliance", "reliance digital", "flight", "makemytrip", "vehicle repair"],
+  "other": []
+}

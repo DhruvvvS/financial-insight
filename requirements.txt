@@ -1,0 +1,9 @@
+# Requirements
+# All the dependencies used in this FinSight
+
+streamlit>=1.60.0
+pandas>=2.0.0
+plotly>=6.0.0
+openpyxl>=3.1.0
+fpdf2>=2.8.0
+numpy>=1.26.0

@@ -1,6 +1,20 @@
+"""
+app.py
+------
+FinSight — Streamlit entry point.
+ 
+Ties together:
+    utils/cleaner.py   -> load_categories(), clean_transactions()
+    utils/analyzer.py  -> monthly_summary(), category_breakdown(),
+                           top_categories(), kpi()
+ 
+Run with: streamlit run app.py
+"""
+
+
+# Imports
 import io
 from pathlib import Path
-
 
 import streamlit as st
 import pandas as pd
@@ -11,8 +25,12 @@ from utils.analyzer import monthly_summary, category_breakdown, top_categories, 
 from utils.forecaster import forecast_next_month, forecast_chart_df, forecast_next_n_months
 from utils.exporter import generate_pdf_report
 
+# Constants
 BASE = Path(__file__).resolve().parent
 
+# -----------------------------
+# Streamlit app
+# -----------------------------
 st.set_page_config(page_title="FinSight", page_icon="💸", layout="wide")
 
 # Data Loading
@@ -27,12 +45,14 @@ def load_data(uploaded_file, categories):
 
 categories = load_categories(BASE / "categories.json")
 
+# Sidebar: File upload and month filter
 st.sidebar.title("💰 FinSight")
 st.sidebar.caption("Personal & small-business finance analyzer")
 
 uploaded_file = st.sidebar.file_uploader("Upload transactions CSV", type="csv")
 use_sample = st.sidebar.checkbox("Use sample data", value=(uploaded_file is None))
 
+# Load data into session state
 if uploaded_file is not None:
     st.session_state["df"] = load_data(uploaded_file, categories)
     st.session_state["source"] = uploaded_file.name
@@ -46,13 +66,16 @@ if "df" not in st.session_state:
     st.info("Upload a transactions CSV from the sidebar, or check **Use sample data** to explore with demo data.")
     st.stop()
 
+# Main app logic
 df = st.session_state["df"]
 st.sidebar.success(f"Loaded: {st.session_state['source']} ({len(df)} transactions)")
 
+# Sidebar: Month filter
 month_options = ["All months"] + list(pd.Index(df["month"]).unique())
 selected_month = st.sidebar.selectbox("Filter by month", month_options)
 filter_month = None if selected_month == "All months" else selected_month
- 
+
+# Filter the DataFrame based on the selected month
 view_df = df if filter_month is None else df[df["month"] == filter_month]
 
 # Header and KPI

@@ -22,6 +22,7 @@ cleaning/categorization/anomaly-detection code has real work to do:
       to mimic real bank statement exports
 """
 
+# Imports
 import argparse
 import random
 from datetime import date, timedelta
@@ -29,7 +30,7 @@ import calendar
 import csv
 import os
 
-
+# Argument parsing
 def parse_args():
     parser = argparse.ArgumentParser(description="Generate dummy transactions for FinSight")
     parser.add_argument("--months", type=int, default=6, help="Number of months of history (3-6 recommended)")
@@ -79,11 +80,9 @@ ANOMALY_EXPENSES = [
     ("VEHICLE REPAIR - SERVICE CENTER", (5000, 15000)),
 ]
 
-
+# Helper function for generating random days within a month
 def random_day_in_month(year, month, day_hint=None, spread=3):
-    """Return a random date within the given month, optionally clustered
-    around a day_hint (used for recurring bills that land near the same
-    day each month, with a little natural jitter)."""
+
     last_day = calendar.monthrange(year, month)[1]
     if day_hint:
         day = min(max(1, day_hint + random.randint(-spread, spread)), last_day)
@@ -91,10 +90,9 @@ def random_day_in_month(year, month, day_hint=None, spread=3):
         day = random.randint(1, last_day)
     return date(year, month, day)
 
-
+# Generate a list of (year, month) tuples for the last `months_back` months
 def month_range(months_back):
-    """Yield (year, month) tuples for the last `months_back` months,
-    oldest first, ending at the current month."""
+
     today = date.today()
     y, m = today.year, today.month
     months = []
@@ -106,7 +104,7 @@ def month_range(months_back):
             y -= 1
     return list(reversed(months))
 
-
+# Generate dummy transactions for the specified number of months
 def generate_transactions(months_back, seed):
     random.seed(seed)
     rows = []
@@ -155,11 +153,9 @@ def generate_transactions(months_back, seed):
     rows.sort(key=lambda r: r[0])
     return rows
 
-
+# Write the generated transactions to a CSV file
 def write_csv(rows, out_path):
-    """Write rows to CSV, formatting the date as DD-MM-YYYY (Indian
-    convention) at write time. Rows are still real `date` objects up to
-    this point so chronological sorting works correctly."""
+
     os.makedirs(os.path.dirname(out_path), exist_ok=True) if os.path.dirname(out_path) else None
     formatted_rows = [
         [d.strftime("%d-%m-%Y"), description, amount, txn_type]
@@ -170,7 +166,7 @@ def write_csv(rows, out_path):
         writer.writerow(["date", "description", "amount", "type"])
         writer.writerows(formatted_rows)
 
-
+# MAIN Function for testing the module independently
 def main():
     args = parse_args()
     rows = generate_transactions(args.months, args.seed)

@@ -13,8 +13,12 @@ Excel export doesn't need a dedicated module — pandas.ExcelWriter
 
 from fpdf import FPDF, XPos, YPos
 
+# ---------------------------------------------------------------------------
+# PDF report generation
+# ---------------------------------------------------------------------------
 
 class _Report(FPDF):
+    # Override header() and footer() to add a title and page numbers to the PDF.
     def header(self):
         self.set_font("Helvetica", "B", 16)
         self.cell(0, 10, "FinSight - Financial Summary Report", new_x=XPos.LMARGIN, new_y=YPos.NEXT, align="C")
@@ -30,12 +34,11 @@ class _Report(FPDF):
         self.set_text_color(150, 150, 150)
         self.cell(0, 10, f"Page {self.page_no()}", align="C")
 
-
+# Helper functions for building the PDF report
 def _section_title(pdf, text):
     pdf.set_font("Helvetica", "B", 13)
     pdf.cell(0, 8, text, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_font("Helvetica", size=11)
-
 
 def _table_row(pdf, values, widths, border=1, bold=False):
     pdf.set_font("Helvetica", "B" if bold else "", 10)
@@ -120,9 +123,7 @@ def generate_pdf_report(kpi_dict, summary_df, breakdown_df, source_name="transac
     return bytes(pdf.output())
 
 
-# ---------------------------------------------------------------------------
-# Manual test when run directly: `python utils/exporter.py`
-# ---------------------------------------------------------------------------
+# MAIN Function for testing the module independently
 
 def main():
     from pathlib import Path

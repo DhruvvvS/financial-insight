@@ -1,5 +1,7 @@
 # FinSight 💸
 
+[FinSight App Link](https://financial-insight.streamlit.app/)
+
 A personal & small-business finance analyzer built with **Python, pandas, and Streamlit**.
 
 Small businesses and freelancers often track expenses in scattered spreadsheets with little visibility into spending patterns. FinSight ingests raw transaction data, automatically cleans and categorizes it, visualizes monthly spending trends, forecasts upcoming expenses, and exports a shareable report — all through an interactive web dashboard.

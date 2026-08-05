@@ -14,40 +14,31 @@ forecast_next_month() returns both estimates together, and
 forecast_chart_df() returns a DataFrame ready to plot actual vs forecast
 on the same line chart.
 
-This module has no dependency on cleaner.py or raw transaction data —
-it only operates on the already-aggregated monthly summary, so it can
-be tested independently.
 """
 
+# Standard library
 import numpy as np
 import pandas as pd
 
-
+# Return the next month label in the same format as the "month" column in
+# analyzer.monthly_summary() output, e.g. "Aug 2026" after "Jul 2026".
 def _next_month_label(last_month_str):
-    """Given a display month string like 'Jul 2026', return the next
-    month in the same format, e.g. 'Aug 2026'."""
+
     dt = pd.to_datetime(last_month_str, format="%b %Y")
     next_dt = dt + pd.DateOffset(months=1)
     return next_dt.strftime("%b %Y")
 
-
+# Average of the last N months expense
 def rolling_average_forecast(summary_df, window=3):
-    """Forecast next month's expense as the average of the last `window`
-    months. If fewer months exist than `window`, uses all available months."""
+
     if summary_df.empty:
         return 0.0
     window = min(window, len(summary_df))
     return round(summary_df["expense"].tail(window).mean(), 2)
 
-
+# Linear trend forecast: fit a straight line through all months and project
 def linear_trend_forecast(summary_df):
-    """Forecast next month's expense by fitting a straight line (least
-    squares) through all months and projecting one step forward.
 
-    Falls back to a plain average when there are fewer than 2 months of
-    data (a line can't be fit through a single point). Negative
-    forecasts are clipped to 0, since expenses can't be negative.
-    """
     if len(summary_df) < 2:
         return rolling_average_forecast(summary_df, window=1)
 
@@ -59,12 +50,9 @@ def linear_trend_forecast(summary_df):
     forecast = slope * next_x + intercept
     return round(max(forecast, 0.0), 2)
 
-
+# Forecast next month's expense using both methods
 def forecast_next_month(summary_df, window=3):
-    """Return both forecast estimates for the month after the last one
-    in summary_df, as a dict:
-        {"month": "Aug 2026", "rolling_avg_estimate": ..., "trend_estimate": ...}
-    """
+  
     if summary_df.empty:
         return {"month": None, "rolling_avg_estimate": 0.0, "trend_estimate": 0.0}
 
@@ -75,20 +63,11 @@ def forecast_next_month(summary_df, window=3):
         "trend_estimate": linear_trend_forecast(summary_df),
     }
 
-
+# Forecast the next `n` months' expense using both methods, returned as a DataFrame
 def forecast_next_n_months(summary_df, n=3, window=3):
     """Forecast the next `n` months' expense, returned as a DataFrame with
     columns: month, rolling_avg_estimate, trend_estimate.
 
-    Rolling average is projected iteratively — each forecasted month is
-    appended to a working series so the next month's rolling average is
-    computed over actuals + prior forecasts, the same way you'd naturally
-    keep rolling a 3-month average forward.
-
-    Linear trend is projected directly from the original fit (slope/intercept
-    fit once on the actual data), evaluated at x = len, len+1, len+2, ...
-    — this avoids the trend line bending under the influence of its own
-    forecasted points.
     """
     if summary_df.empty:
         return pd.DataFrame(columns=["month", "rolling_avg_estimate", "trend_estimate"])
@@ -128,16 +107,9 @@ def forecast_next_n_months(summary_df, n=3, window=3):
         }
     )
 
-
+# Return a DataFrame combining actual monthly expenses with `n` forecasted rows, ready for plotting
 def forecast_chart_df(summary_df, window=3, method="rolling", n=1):
-    """Return a DataFrame combining actual monthly expenses with `n`
-    forecasted future rows, tagged by a 'type' column ('actual' /
-    'forecast') — ready to feed into a Plotly line chart colored by type.
 
-    `method` picks which estimate becomes the plotted forecast point:
-    "rolling" (default) or "trend". `n=1` (default) reproduces the old
-    single-month-ahead behavior; pass n=3 for a 3-month-ahead chart.
-    """
     forecast_df = forecast_next_n_months(summary_df, n=n, window=window)
     chart_df = summary_df[["month", "expense"]].copy()
     chart_df["type"] = "actual"
@@ -151,9 +123,7 @@ def forecast_chart_df(summary_df, window=3, method="rolling", n=1):
     return chart_df
 
 
-# ---------------------------------------------------------------------------
-# Manual test when run directly: `python utils/forecaster.py`
-# ---------------------------------------------------------------------------
+# MAIN Function for testing the module independently
 
 def main():
     from pathlib import Path

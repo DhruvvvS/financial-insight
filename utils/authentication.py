@@ -98,7 +98,7 @@ We will call this login gate function at the start of app.py to check if the use
 If the user is not authenticated, we will show the login form and handle the login process.
 """
 
-def login_gate(username, password):
+def login_gate():
     init_db()
 
     if st.session_state.get("authenticated"):

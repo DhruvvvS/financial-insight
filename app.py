@@ -24,6 +24,7 @@ from utils.cleaner import load_categories, clean_transactions
 from utils.analyzer import monthly_summary, category_breakdown, top_categories, kpi
 from utils.forecaster import forecast_next_month, forecast_chart_df, forecast_next_n_months
 from utils.exporter import generate_pdf_report
+from utils.authentication import login_gate
 
 # Constants
 BASE = Path(__file__).resolve().parent
@@ -32,6 +33,10 @@ BASE = Path(__file__).resolve().parent
 # Streamlit app
 # -----------------------------
 st.set_page_config(page_title="FinSight", page_icon="💸", layout="wide")
+
+login_gate()
+# Nothing below this line runs until the person is authenticated 
+# login_gate() calls st.stop() internally if they aren't.
 
 # Data Loading
 def load_data(uploaded_file, categories):
@@ -48,6 +53,14 @@ categories = load_categories(BASE / "categories.json")
 # Sidebar: File upload and month filter
 st.sidebar.title("💰 FinSight")
 st.sidebar.caption("Personal & small-business finance analyzer")
+st.sidebar.markdown(f"Logged in as **{st.session_state.get('username', 'unknown')}**") # display the username in the sidebar
+
+if st.sidebar.button("Log Out"):
+    # Clearing 'authenticated' is enough — login_gate() checks this flag
+    # on the next rerun and shows the login form again.
+    st.session_state["authenticated"] = False
+    st.rerun()
+st.sidebar.divider()
 
 uploaded_file = st.sidebar.file_uploader("Upload transactions CSV", type="csv")
 use_sample = st.sidebar.checkbox("Use sample data", value=(uploaded_file is None))

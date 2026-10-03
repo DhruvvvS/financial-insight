@@ -79,10 +79,9 @@ def register_user(username, password):
 def verify_user(username, password):
     
     conn = sqlite3.connect(Db_Path)
-    conn.execute(
+    result = conn.execute(
         'SELECT password FROM users WHERE username = ?', (username,)
-        )
-    result = conn.fetchone()
+    ).fetchone()
     conn.close()
 
     # Returns True if the username exists and the password matches, False otherwise.

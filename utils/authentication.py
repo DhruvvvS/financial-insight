@@ -81,7 +81,7 @@ def verify_user(username, password):
     conn = sqlite3.connect(Db_Path)
     result = conn.execute(
         'SELECT password FROM users WHERE username = ?', (username,)
-    ).fetchone()
+    ).fetchone()            
     conn.close()
 
     # Returns True if the username exists and the password matches, False otherwise.
